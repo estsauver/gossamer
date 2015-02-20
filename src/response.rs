@@ -1,3 +1,5 @@
+#[feature(old_io)]
+
 use std::old_io::{Writer, IoResult};
 
 use super::request::Request;
@@ -11,11 +13,13 @@ impl <'a> Response<'a> {
   }
 
   fn as_bytes(&self) -> &[u8] {
-"HTTP/1.1 200 OK\r\n
-date: Mon, 23 May 2005 22:38:34 GMT\r\n
-Server: Gossamer\r\n
-Last-Modified: Wed, 08 Jan 2003 23:11:55 GMT\r\n
-Content-Type: text/html; charset=UTF-8\r\n
-Connection: close".as_bytes()
+"HTTP/1.1 200 OK
+Date: Mon, 23 May 2005 22:38:34 GMT
+Server: Gossamer
+Last-Modified: Wed, 08 Jan 2003 23:11:55 GMT
+Content-Type: text/html; charset=UTF-8
+Connection: close
+
+Heyo".as_bytes()
   }
 }

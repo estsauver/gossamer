@@ -3,7 +3,13 @@ pub struct Request<'a> {
   headers: Headers<'a>
 }
 
-trait RequestIterator : Iterator {
-  type Item = Request;
+
+impl <'a> Request<'a> {
+
+  pub fn make<'a>(reader: &mut Reader, buffer: &'a mut [u8]) -> Option<Request<'a>> {
+    Some(Request { headers: Headers::empty() } )
+  }
+
 
 }
+
