@@ -30,12 +30,12 @@ fn main() {
   fn handle_stream(stream: TcpStream) -> () {
     // This should probably be in a loop? Concurrency, amirite?
     
-    let mut reader = BufferedReader::new(stream);
+    let mut reader = BufferedReader::new(stream.clone());
     let mut buffer = [0u8; 4096];
   
     let request = make_request(&mut reader, &mut buffer).unwrap();
     let response = handle_request(&request);
-    response.dump(&mut stream);
+    response.dump(&mut stream.clone());
   }
   
   for stream in acceptor.incoming() {
