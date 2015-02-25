@@ -1,8 +1,10 @@
 use std::old_io::{TcpStream, TcpListener, IoResult};
 use std::old_io::{Acceptor, Listener, BufferedReader};
+use std::sync::TaskPool;
 use std::thread::Thread;
 
 extern crate gossamer;
+extern crate log;
 use gossamer::headers::Headers;
 use gossamer::cabinet::Cabinet;
 use gossamer::request::{Request};
@@ -19,27 +21,28 @@ fn main() {
     Response {request: request}
   }
 
-  // Not sure what this should return.
+  // TODO Not sure what this should return.
   fn handle_stream(stream: TcpStream) -> () {
-    // This should probably be in a loop? Concurrency, amirite?
-    
     let mut reader = BufferedReader::new(stream.clone());
     let mut buffer = [0u8; 4096];
   
     let request = Request::make(&mut reader, &mut buffer).unwrap();
-
     let response = handle_request(&request);
     response.dump(&mut stream.clone());
   }
+
+
+  // TODO: Make this configurable
+  let pool = TaskPool::new(6);
   
   for stream in acceptor.incoming() {
     match stream {
-      Err(e) => { return },
-      Ok(stream) => {
-        Thread::spawn(move|| {
-          handle_stream(stream);
-        });
-      }
+      Err(e) => { println!("ERROR!") },
+        Ok(stream) => {
+          pool.execute(move|| {
+              handle_stream(stream);
+              });
+        }
     }
   }
   drop(acceptor);
