@@ -3,3 +3,11 @@
 name = "gossamer"
 version = "0.0.1"
 authors = ["Earl St Sauver <estsauver@gmail.com>"]
+
+[dependencies]
+regex = "0.1.15"
+regex_macros = "0.1.8"
+
+[[bin]]
+doc = false
+name = "gossamer_server"

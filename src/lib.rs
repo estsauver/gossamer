@@ -1,3 +1,10 @@
+#![feature(plugin)]
+#![plugin(regex_macros)]
+
+extern crate regex;
+extern crate regex_macros;
+extern crate test;
+
 #[macro_use]
 extern crate log;
 

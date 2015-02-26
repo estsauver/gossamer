@@ -1,6 +1,6 @@
 #[feature(old_io)]
 
-use std::old_io::{Writer, IoResult};
+use std::io::{Write, Result};
 
 use super::request::Request;
 pub struct Response<'a> {
@@ -8,7 +8,7 @@ pub struct Response<'a> {
 }
 
 impl <'a> Response<'a> {
-  pub fn dump(&self, writer: &mut Writer) -> IoResult<()> {
+  pub fn dump(&self, writer: &mut Write) -> Result<()> {
     writer.write_all(self.as_bytes())
   }
 
