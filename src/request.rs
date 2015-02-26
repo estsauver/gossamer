@@ -17,20 +17,27 @@ pub enum Method {
   POST,
   PUT,
   DELETE,
-  CONNECT
+  CONNECT,
+  OPTIONS,
+  TRACE
 }
 
 impl Method {
 
   /// This gets a request method from a given request line string. 
-  /// It could proably be converted to use case insensitive regexes/a faster match
+  /// It could proably be converted to use case insensitive regexes/a faster match then the regexes.
+  /// These regexe's are all compiled, which does increase the size of the binary.
   pub fn make<'a>(input: &'a str) -> Option<(Method, &'a str)> {
     Method::match_method(input, regex!(r"^[Gg][Ee][Tt] "), Method::GET).or_else(|| {
       Method::match_method(input, regex!(r"^[Pp][Oo][Ss][Tt] "), Method::POST).or_else(|| {
         Method::match_method(input, regex!(r"^[Pp][Uu][Tt] "), Method::PUT).or_else(|| {
           Method::match_method(input, regex!(r"^[Hh][Ee][Aa][Dd] "), Method::HEAD).or_else(|| {
             Method::match_method(input, regex!(r"^[Dd][Ee][Ll][Ee][Tt][Ee] "), Method::DELETE).or_else(|| {
-              Method::match_method(input, regex!(r"^[Cc][Oo][Nn][Nn][Ee][Cc][Tt] "), Method::CONNECT)
+              Method::match_method(input, regex!(r"^[Cc][Oo][Nn][Nn][Ee][Cc][Tt] "), Method::CONNECT).or_else(|| {
+                Method::match_method(input, regex!(r"^[Oo][Pp][Tt][Ii][Oo][Nn][Ss] "), Method::OPTIONS).or_else(|| {
+                  Method::match_method(input, regex!(r"^[Tt][Rr][Aa][Cc][Ee] "), Method::TRACE)
+                })
+              })
             })
           })
         })
@@ -114,6 +121,20 @@ mod tests {
   fn it_parses_an_http_connect() {
     test_req("CONNECT / HTTP/1.1", |req| {
       assert_eq!(req.method, Method::CONNECT);
+    });
+  }
+
+  #[test]
+  fn it_parses_an_http_options() {
+    test_req("OPTIONS / HTTP/1.1", |req| {
+      assert_eq!(req.method, Method::OPTIONS);
+    });
+  }
+
+  #[test]
+  fn it_parses_an_http_trace() {
+    test_req("TRACE / HTTP/1.1", |req| {
+      assert_eq!(req.method, Method::TRACE);
     });
   }
 
