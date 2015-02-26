@@ -27,22 +27,27 @@ impl Method {
   /// This gets a request method from a given request line string. 
   /// It could proably be converted to use case insensitive regexes/a faster match then the regexes.
   /// These regexe's are all compiled, which does increase the size of the binary.
+  /// This method should maybe be refactored to take a list of methods and map across it?
   pub fn make<'a>(input: &'a str) -> Option<(Method, &'a str)> {
-    Method::match_method(input, regex!(r"^[Gg][Ee][Tt] "), Method::GET).or_else(|| {
-      Method::match_method(input, regex!(r"^[Pp][Oo][Ss][Tt] "), Method::POST).or_else(|| {
-        Method::match_method(input, regex!(r"^[Pp][Uu][Tt] "), Method::PUT).or_else(|| {
-          Method::match_method(input, regex!(r"^[Hh][Ee][Aa][Dd] "), Method::HEAD).or_else(|| {
-            Method::match_method(input, regex!(r"^[Dd][Ee][Ll][Ee][Tt][Ee] "), Method::DELETE).or_else(|| {
-              Method::match_method(input, regex!(r"^[Cc][Oo][Nn][Nn][Ee][Cc][Tt] "), Method::CONNECT).or_else(|| {
-                Method::match_method(input, regex!(r"^[Oo][Pp][Tt][Ii][Oo][Nn][Ss] "), Method::OPTIONS).or_else(|| {
-                  Method::match_method(input, regex!(r"^[Tt][Rr][Aa][Cc][Ee] "), Method::TRACE)
-                })
-              })
-            })
-          })
-        })
+    let methods = vec![
+      (regex!(r"^[Gg][Ee][Tt] "), Method::GET), 
+      (regex!(r"^[Pp][Oo][Ss][Tt] "), Method::POST),
+      (regex!(r"^[Pp][Uu][Tt] "), Method::PUT),
+      (regex!(r"^[Pp][Uu][Tt] "), Method::PUT),
+      (regex!(r"^[Hh][Ee][Aa][Dd] "), Method::HEAD),
+      (regex!(r"^[Dd][Ee][Ll][Ee][Tt][Ee] "), Method::DELETE),
+      (regex!(r"^[Cc][Oo][Nn][Nn][Ee][Cc][Tt] "), Method::CONNECT),
+      (regex!(r"^[Oo][Pp][Tt][Ii][Oo][Nn][Ss] "), Method::OPTIONS),
+      (regex!(r"^[Tt][Rr][Aa][Cc][Ee] "), Method::TRACE)
+    ];
+
+    methods.into_iter()
+      .map(|(regex, method)| {
+        Method::match_method(input, regex, method)
       })
-    })
+      .filter(|x: &Option<(Method, &str)>| { x.is_some() })
+      .map(|x| { x.unwrap() })
+      .next()
   }
 
   fn match_method<'a>(input: &'a str, regex: Regex, method: Method) -> Option<(Method, &'a str)> {
