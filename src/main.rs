@@ -14,8 +14,8 @@ fn main() {
 
   let listener = TcpListener::bind("127.0.0.1:3000").unwrap();
 
-  fn handle_request<'a>(request: &'a Request) -> Response<'a> {
-    Response {request: request}
+  fn handle_request<'a>(request: &'a Request, stream: &mut TcpStream) -> Result<()> {
+    Response {request: request}.dump(stream)
   }
 
   // TODO Not sure what this should return.
@@ -24,8 +24,7 @@ fn main() {
     let mut buffer = [0u8; 4096];
   
     let request = Request::make(&mut reader, &mut buffer).unwrap();
-    let response = handle_request(&request);
-    response.dump(&mut stream.try_clone().unwrap());
+    handle_request(&request, &mut stream.try_clone().unwrap());
   }
 
 
